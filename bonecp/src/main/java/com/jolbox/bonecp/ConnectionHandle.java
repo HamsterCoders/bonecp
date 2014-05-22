@@ -57,9 +57,9 @@ import com.jolbox.bonecp.proxy.TransactionRecoveryResult;
 
 /**
  * Connection handle wrapper around a JDBC connection.
- * 
+ *
  * @author wwadge
- * 
+ *
  */
 public class ConnectionHandle implements Connection,Serializable{
 	/** uid */
@@ -87,7 +87,7 @@ public class ConnectionHandle implements Connection,Serializable{
 	/** Time when this connection was created. */
 	protected long connectionCreationTimeInMs;
 	/** Pool handle. */
-	private BoneCP pool; 
+	private BoneCP pool;
 	/** Config setting. */
 	private Boolean defaultReadOnly;
 	/** Config setting. */
@@ -120,7 +120,7 @@ public class ConnectionHandle implements Connection,Serializable{
 	private ConnectionHook connectionHook;
 	/** If true, give warnings if application tried to issue a close twice (for debugging only). */
 	protected boolean doubleCloseCheck;
-	/** exception trace if doubleCloseCheck is enabled. */  
+	/** exception trace if doubleCloseCheck is enabled. */
 	protected volatile String doubleCloseException = null;
 	/** If true, log sql statements. */
 	private boolean logStatementsEnabled;
@@ -133,7 +133,7 @@ public class ConnectionHandle implements Connection,Serializable{
 	/** Map of translations + result from last recovery. */
 	protected TransactionRecoveryResult recoveryResult;
 	/** Connection url. */
-	protected String url;	
+	protected String url;
 	/** Keep track of the thread. */
 	protected Thread threadUsingConnection;
 	/** Configured max connection age. */
@@ -164,7 +164,7 @@ public class ConnectionHandle implements Connection,Serializable{
 	/*
 	 * From: http://publib.boulder.ibm.com/infocenter/db2luw/v8/index.jsp?topic=/com.ibm.db2.udb.doc/core/r0sttmsg.htm
 	 * Table 7. Class Code 08: Connection Exception
-		SQLSTATE Value	  
+		SQLSTATE Value
 		Value	Meaning
 		08001	The application requester is unable to establish the connection.
 		08002	The connection already exists.
@@ -175,11 +175,11 @@ public class ConnectionHandle implements Connection,Serializable{
 		08502	The CONNECT statement issued by an application process running with a SYNCPOINT of TWOPHASE has failed, because no transaction manager is available.
 		08504	An error was encountered while processing the specified path rename configuration file.
 	 */
-	/** SQL Failure codes indicating the database is broken/died (and thus kill off remaining connections). 
-	  Anything else will be taken as the *connection* (not the db) being broken. Note: 08S01 is considered as connection failure in MySQL. 
-          57P01 means that postgresql was restarted. 
+	/** SQL Failure codes indicating the database is broken/died (and thus kill off remaining connections).
+	  Anything else will be taken as the *connection* (not the db) being broken. Note: 08S01 is considered as connection failure in MySQL.
+          57P01 means that postgresql was restarted.
 	 */
-	private static final ImmutableSet<String> sqlStateDBFailureCodes = ImmutableSet.of("08001", "08006", "08007", "08S01", "57P01"); 
+	private static final ImmutableSet<String> sqlStateDBFailureCodes = ImmutableSet.of("08001", "08006", "08007", "08S01", "57P01");
 	/** Keep track of open statements. */
 	protected ConcurrentMap<Statement, String> trackedStatement;
 	/** Avoid creating a new string object each time. */
@@ -188,7 +188,7 @@ public class ConnectionHandle implements Connection,Serializable{
 	/**
 	 * Internal constructor
 	 * @param connection
-	 * @param partition 
+	 * @param partition
 	 * @param pool
 	 * @param recreating
 	 * @throws SQLException
@@ -196,7 +196,7 @@ public class ConnectionHandle implements Connection,Serializable{
 	protected ConnectionHandle(Connection connection, ConnectionPartition partition, BoneCP pool, boolean recreating) throws SQLException {
 		boolean newConnection = connection == null;
 
-		
+
 		this.originatingPartition = partition;
 		this.pool = pool;
 		this.connectionHook = pool.getConfig().getConnectionHook();
@@ -208,7 +208,7 @@ public class ConnectionHandle implements Connection,Serializable{
 		}
 
 		this.url = pool.getConfig().getJdbcUrl();
-		this.finalizableRefs = pool.getFinalizableRefs(); 
+		this.finalizableRefs = pool.getFinalizableRefs();
 		this.defaultReadOnly = pool.getConfig().getDefaultReadOnly();
 		this.defaultCatalog = pool.getConfig().getDefaultCatalog();
 		this.defaultTransactionIsolationValue = pool.getConfig().getDefaultTransactionIsolationValue();
@@ -254,10 +254,10 @@ public class ConnectionHandle implements Connection,Serializable{
 		if(!newConnection && !connection.getAutoCommit() && !connection.isClosed()){
 			connection.rollback();
 		}
-		if (this.defaultAutoCommit != null){
+		if (this.defaultAutoCommit != true){
 			setAutoCommit(this.defaultAutoCommit);
 		}
-		if (this.defaultReadOnly != null){
+		if (this.defaultReadOnly != false){
 			setReadOnly(this.defaultReadOnly);
 		}
 		if (this.defaultCatalog != null){
@@ -289,7 +289,7 @@ public class ConnectionHandle implements Connection,Serializable{
 		handle.possiblyBroken = this.possiblyBroken;
 		handle.debugHandle = this.debugHandle;
 		this.connection = null;
-		
+
 		return handle;
 	}
 
@@ -297,7 +297,7 @@ public class ConnectionHandle implements Connection,Serializable{
 
 
 
-	/** Private -- used solely for unit testing. 
+	/** Private -- used solely for unit testing.
 	 * @param connection
 	 * @param preparedStatementCache
 	 * @param callableStatementCache
@@ -328,13 +328,13 @@ public class ConnectionHandle implements Connection,Serializable{
 	}
 
 	/**
-	 * Create a dummy handle. 
+	 * Create a dummy handle.
 	 */
 	private ConnectionHandle(){
 		// for static factory.
 	}
 
-	/** Sends any configured SQL init statement. 
+	/** Sends any configured SQL init statement.
 	 * @throws SQLException on error
 	 */
 	public void sendInitSQL() throws SQLException {
@@ -367,10 +367,10 @@ public class ConnectionHandle implements Connection,Serializable{
 	}
 
 
-	/** 
+	/**
 	 * Given an exception, flag the connection (or database) as being potentially broken. If the exception is a data-specific exception,
-	 * do nothing except throw it back to the application. 
-	 * 
+	 * do nothing except throw it back to the application.
+	 *
 	 * @param e SQLException e
 	 * @return SQLException for further processing
 	 */
@@ -378,9 +378,9 @@ public class ConnectionHandle implements Connection,Serializable{
 	    String state = e.getSQLState();
 	    boolean alreadyDestroyed = false;
 
-		ConnectionState connectionState = this.getConnectionHook() != null ? this.getConnectionHook().onMarkPossiblyBroken(this, state, e) : ConnectionState.NOP; 
+		ConnectionState connectionState = this.getConnectionHook() != null ? this.getConnectionHook().onMarkPossiblyBroken(this, state, e) : ConnectionState.NOP;
 		if (state == null){ // safety;
-			state = "08999"; 
+			state = "08999";
 		}
 
 		if (((sqlStateDBFailureCodes.contains(state) || connectionState.equals(ConnectionState.TERMINATE_ALL_CONNECTIONS)) && this.pool != null) && this.pool.getDbIsDown().compareAndSet(false, true) ){
@@ -407,7 +407,7 @@ public class ConnectionHandle implements Connection,Serializable{
 			getOriginatingPartition().getPoolWatchThreadSignalQueue().offer(new Object()); // item being pushed is not important.
 		    }
 		}
-		
+
 		// SQL-92 says:
 		//		 Class values that begin with one of the <digit>s '5', '6', '7',
 		//         '8', or '9' or one of the <simple Latin upper case letter>s 'I',
@@ -423,7 +423,7 @@ public class ConnectionHandle implements Connection,Serializable{
 		// state == 40001 is mysql specific triggered when a deadlock is detected
 		// state == HY000 is firebird specific triggered when a connection is broken
 		char firstChar = state.charAt(0);
-		if (connectionState.equals(ConnectionState.CONNECTION_POSSIBLY_BROKEN) || state.equals("40001") || 
+		if (connectionState.equals(ConnectionState.CONNECTION_POSSIBLY_BROKEN) || state.equals("40001") ||
 				state.equals("HY000") ||
 				state.startsWith("08") ||  (firstChar >= '5' && firstChar <='9') /*|| (firstChar >='I' && firstChar <= 'Z')*/){
 			this.possiblyBroken = true;
@@ -449,11 +449,11 @@ public class ConnectionHandle implements Connection,Serializable{
 
 	/**
 	 * Checks if the connection is (logically) closed and throws an exception if it is.
-	 * 
+	 *
 	 * @throws SQLException
 	 *             on error
-	 * 
-	 * 
+	 *
+	 *
 	 */
 	private void checkClosed() throws SQLException {
 		if (this.logicallyClosed.get()) {
@@ -462,8 +462,8 @@ public class ConnectionHandle implements Connection,Serializable{
 	}
 
 	/**
-	 * Release the connection back to the pool. 
-	 * 
+	 * Release the connection back to the pool.
+	 *
 	 * @throws SQLException Never really thrown
 	 */
 	public void close() throws SQLException {
@@ -472,7 +472,7 @@ public class ConnectionHandle implements Connection,Serializable{
 			if (this.resetConnectionOnClose /*FIXME: && !getAutoCommit() && !isTxResolved() */){
 				/*if (this.autoCommitStackTrace != null){
 						logger.debug(this.autoCommitStackTrace);
-						this.autoCommitStackTrace = null; 
+						this.autoCommitStackTrace = null;
 					} else {
 						logger.debug(DISABLED_AUTO_COMMIT_WARNING);
 					}*/
@@ -496,11 +496,11 @@ public class ConnectionHandle implements Connection,Serializable{
 					for (Entry<Statement, String> statementEntry: this.trackedStatement.entrySet()){
 						statementEntry.getKey().close();
 						if (this.detectUnclosedStatements){
-							logger.warn(String.format(UNCLOSED_LOG_ERROR_MESSAGE, statementEntry.getValue()));		
+							logger.warn(String.format(UNCLOSED_LOG_ERROR_MESSAGE, statementEntry.getValue()));
 						}
 					}
 					this.trackedStatement.clear();
-				} 
+				}
 
 				if (!this.connectionTrackingDisabled){
 					pool.getFinalizableRefs().remove(this.connection);
@@ -512,7 +512,7 @@ public class ConnectionHandle implements Connection,Serializable{
 				try {
 				    handle = this.recreateConnectionHandle();
 				    this.pool.connectionStrategy.cleanupConnection(this, handle);
-				    this.pool.releaseConnection(handle);				    
+				    this.pool.releaseConnection(handle);
 				} catch(SQLException e) {
 				    //check if the connection was already closed by the recreation
 				    if (!isClosed()) {
@@ -521,8 +521,8 @@ public class ConnectionHandle implements Connection,Serializable{
 				    }
 				    throw e;
 				}
-				
-				
+
+
 				if (this.doubleCloseCheck){
 					this.doubleCloseException = this.pool.captureStackTrace(CLOSED_TWICE_EXCEPTION_MESSAGE);
 				}
@@ -540,7 +540,7 @@ public class ConnectionHandle implements Connection,Serializable{
 
 	/**
 	 * Close off the connection.
-	 * 
+	 *
 	 * @throws SQLException
 	 */
 	protected void internalClose() throws SQLException {
@@ -1444,7 +1444,7 @@ public class ConnectionHandle implements Connection,Serializable{
 
 	/**
 	 * Gets true if connection has triggered an exception at some point.
-	 * 
+	 *
 	 * @return true if the connection has triggered an error
 	 */
 	public boolean isPossiblyBroken() {
@@ -1454,7 +1454,7 @@ public class ConnectionHandle implements Connection,Serializable{
 
 	/**
 	 * Gets the partition this came from.
-	 * 
+	 *
 	 * @return the partition this came from
 	 */
 	public ConnectionPartition getOriginatingPartition() {
@@ -1463,7 +1463,7 @@ public class ConnectionHandle implements Connection,Serializable{
 
 	/**
 	 * Sets Originating partition
-	 * 
+	 *
 	 * @param originatingPartition
 	 *            to set
 	 */
@@ -1485,7 +1485,7 @@ public class ConnectionHandle implements Connection,Serializable{
 
 
 	/** Clears out the statement handles.
-	 * @param internalClose if true, close the inner statement handle too. 
+	 * @param internalClose if true, close the inner statement handle too.
 	 */
 	protected void clearStatementCaches(boolean internalClose) {
 
@@ -1518,8 +1518,8 @@ public class ConnectionHandle implements Connection,Serializable{
 		this.debugHandle = debugHandle;
 	}
 
-	/** Deprecated. Please use getInternalConnection() instead. 
-	 *  
+	/** Deprecated. Please use getInternalConnection() instead.
+	 *
 	 * @return the raw connection
 	 */
 	@Deprecated
@@ -1645,7 +1645,7 @@ public class ConnectionHandle implements Connection,Serializable{
 	 * @return true if the connection has expired.
 	 */
 	public boolean isExpired() {
-		return this.maxConnectionAgeInMs > 0 
+		return this.maxConnectionAgeInMs > 0
 				&& isExpired(System.currentTimeMillis());
 	}
 
@@ -1654,7 +1654,7 @@ public class ConnectionHandle implements Connection,Serializable{
 	 * @return true if the connection has expired.
 	 */
 	protected boolean isExpired(long currentTime) {
-		return this.maxConnectionAgeInMs > 0 
+		return this.maxConnectionAgeInMs > 0
 				&& (currentTime - this.connectionCreationTimeInMs) > this.maxConnectionAgeInMs;
 	}
 
@@ -1699,8 +1699,8 @@ public class ConnectionHandle implements Connection,Serializable{
 
 
 	/**
-	 * Destroys the internal connection handle and creates a new one. 
-	 * @throws SQLException 
+	 * Destroys the internal connection handle and creates a new one.
+	 * @throws SQLException
 	 */
 	public void refreshConnection() throws SQLException{
 		this.connection.close(); // if it's still in use, close it.
