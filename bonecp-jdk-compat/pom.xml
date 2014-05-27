@@ -19,7 +19,7 @@
     <parent>
         <groupId>com.jolbox</groupId>
         <artifactId>bonecp-parent</artifactId>
-        <version>0.8.1-SNAPSHOT</version>
+        <version>0.8.1Fork-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
@@ -29,5 +29,5 @@
     <name>BoneCP :: JDK567 compatibility</name>
     <description>Helper classes to aid JDK5 users</description>
 
-   
+
 </project>
