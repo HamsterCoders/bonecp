@@ -13,20 +13,20 @@
  |  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  |  See the License for the specific language governing permissions and
  |  limitations under the License.
--->  
+-->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
-    <parent> 
+    <parent>
         <groupId>com.jolbox</groupId>
         <artifactId>bonecp-parent</artifactId>
         <version>0.8.1-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
- 
+
     <artifactId>bonecp</artifactId>
-    <packaging>bundle</packaging> 
-    <name>BoneCP :: Core Library</name>
+    <packaging>bundle</packaging>
+    <name>BoneCP :: Core Library :: Hamstercoders edition</name>
     <description>Lightweight connection pool.</description>
     <build>
         <plugins>
@@ -64,7 +64,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-assembly-plugin</artifactId>
-                
+
                 <configuration>
                     <descriptors>
                         <descriptor>${basedir}/../src/main/assembly/assembly.xml</descriptor>
@@ -73,10 +73,10 @@
             </plugin>
         </plugins>
     </build>
-    
+
     <dependencies>
-    
-    <!-- 
+
+    <!--
 <dependency>
       <groupId>org.powermock</groupId>
       <artifactId>powermock-module-junit4</artifactId>
@@ -86,20 +86,20 @@
       <groupId>org.powermock</groupId>
       <artifactId>powermock-api-easymock</artifactId>
       <scope>test</scope>
-   </dependency>  
+   </dependency>
  -->
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
         </dependency>
-        
+
         <dependency>
 			<groupId>postgresql</groupId>
 			<artifactId>postgresql</artifactId>
 			<scope>test</scope>
 			<version>9.1-901-1.jdbc4</version>
 		</dependency>
-        
+
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
@@ -111,7 +111,7 @@
             <scope>test</scope>
         </dependency>
 
-        <dependency> 
+        <dependency>
             <groupId>com.jolbox</groupId>
             <artifactId>bonecp-jdk-compat</artifactId>
             <scope>test</scope>
@@ -135,8 +135,8 @@
 			<version>1.8.4</version>
 			   <scope>test</scope>
 		</dependency>
-            
-            
+
+
         <dependency>
             <groupId>org.easymock</groupId>
             <artifactId>easymock</artifactId>
