@@ -25,7 +25,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>bonecp</artifactId>
-    <packaging>bundle</packaging>
+    <packaging>jar</packaging>
     <name>BoneCP :: Core Library :: Hamstercoders edition</name>
     <description>Lightweight connection pool.</description>
     <build>
