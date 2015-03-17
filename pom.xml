@@ -55,10 +55,10 @@
 	</issueManagement>
 
 	<distributionManagement>
-		<snapshotRepository>
-			<id>hamsters-jenkins</id>
-			<url>http://repu.huyaru.com/</url>
-		</snapshotRepository>
+		<repository>
+			<id>internal</id>
+			<url>http://192.168.4.104:6080/repository/internal</url>
+		</repository>
 	</distributionManagement>
 
 	<developers>
